@@ -37,6 +37,10 @@ initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get('/', async (req, res)=> {
+    res.render('fistView')
+});
+
 app.use('/products',viewsRouter);
 app.use('/api',fakerRouter);
 app.use('/session',sessionsRouter);

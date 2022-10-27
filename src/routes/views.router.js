@@ -25,10 +25,4 @@ router.get('/chat', async (req, res)=> {
     res.send(chat);
 })
 
-//normalizr
-/*router.get('/normalized', async (req, res)=>{
-    let normalize = await File.getNormalize()
-    res.send(normalize)
-})*/
-
 export default router
