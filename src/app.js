@@ -12,7 +12,7 @@ import MongoStore from "connect-mongo";
 import initializePassport from "./config/passport.config.js";
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT||8080;
 const server = app.listen(PORT,()=>console.log(`Listening on ${server.address().port}`));
 const connection = mongoose.connect(`mongodb+srv://julieta:12345@proyecto-carreras.appkwcp.mongodb.net/Base001?retryWrites=true&w=majority`)
 const io = new Server(server);
