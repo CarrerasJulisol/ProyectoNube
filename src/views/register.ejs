@@ -1,0 +1,49 @@
+<%- include('./partials/head') %>
+
+<div class="register-container">
+    <h2 class="title">Registrate</h2>
+
+    <div>
+        <form id="registerForm" class="form-register">
+            <input id="name" name="name" class="complete" placeholder="Nombre"></input>
+            <input id="email" name="email" class="complete" placeholder="Email"></input>
+            <input type="password" id="password" name="password" class="complete" placeholder="Contraseña"></input>
+            <input type="password" id="re-password" name="password" class="complete" placeholder="Repetir contraseña"></input>
+            <input type="submit" class="boton-ok">
+        </form>
+    </div>
+
+    <div>
+        <button class="boton-ok"><a href="http://localhost:8080/session/login">Iniciar sesión</a></button>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('registerForm');
+
+    form.addEventListener('submit',evt=>{
+        evt.preventDefault();
+        let password = document.getElementById('password');
+        let rePassword = document.getElementById('re-password');
+        console.log(password.value)
+        console.log(rePassword.value)
+        if (password.value === rePassword.value){
+            password.classList.remove('different');
+            rePassword.classList.remove('different');
+            let data = new FormData(form);
+            let obj = {};
+            data.forEach((value,key)=>obj[key]=value);
+            fetch('/session/register',{
+                method:'POST',
+                body:JSON.stringify(obj),
+                headers:{
+                    "Content-Type":"application/json"
+                }
+            }).then(result=>result.json()).then(json=>console.log(json));
+        }else{
+            password.classList.add('different');
+            rePassword.classList.add('different');
+        }
+    })
+
+</script>

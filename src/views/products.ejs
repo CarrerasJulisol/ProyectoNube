@@ -1,0 +1,120 @@
+<%- include('./partials/head') %>
+<% let data = user %> 
+<% if (!user) { %>
+    <div class="modal" id="modal">
+        <form class="box-modal" id="identifier">
+            <h3>Inicia Sesión</h3>
+            <p style="margin: 5px">Inicia sesión o registrate para poder identificarte en el chat</p>
+            <div class="">
+                <button class="boton-ok"><a href="http://localhost:8080/session/login">Iniciar Sesión</a></button>
+                <button class="boton-ok"><a href="http://localhost:8080/session/register">Registrarme</a></button>
+            </div>
+        </form>
+    </div>
+<% } else { %>
+        <nav class="session-started">
+            <h2 class="welcome">Hola <%= user.name %>.</h2>
+            <button class="close-session"><a href="http://localhost:8080/session/logout" class="black">Cerrar Sesión</a></button>
+        </nav>
+<% } %>
+
+<h2 class="title">Agregar productos</h2>
+
+<div class="form-container">
+    <form id="productForm" class="form">
+        <input id="name" name="name" class="complete" placeholder="Nombre"></input>
+        <input id="price" name="price" class="complete" placeholder="Precio"></input>
+        <input type="file" id="image" name="image" class="add-file"></input>
+        <input type="submit" class="boton-ok">
+    </form>
+</div>
+
+<h2 class="title">Productos</h2>
+<% if (hasProducts) { %>
+    <div class="grid" id="grid">
+        <% allProducts.forEach(product => { %>
+            <div class="card" id="card">
+                <p class="title-card"><%= product.name %></p>
+                <p>$<%= product.price %></p>
+                <img src="http://localhost:8080/img/<%= product.image %>" class="img"></img>
+            </div>
+        <% }) %>
+    </div>
+<% } else { %>
+    <p class="no-products">Ups, aún no hay productos.</p>
+<% } %>
+
+<h2 class="title">Chat</h2>
+<div class="chat-container">
+    <div id="chat" class="chat-box">
+    </div>
+    <div class="box-chat-container">
+        <img src="http://localhost:8080/img/avatar.png" alt="avatar" class="avatar"><span id="identified" class="stlye: margin-left: 20px;"><% if (user) { %>
+         <%= user.email %><% } else { %>identidicate<% } %></span>
+        <form id="write-message" class="writing-box">
+            <textarea type="text" name="message" id="message" placeholder="Escribe tu mensaje aqui." class="add-message"></textarea>
+            <input type="submit" class="boton-ok">
+        </form>
+    </div>
+</div>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const Form = document.getElementById('productForm');
+    const socket = io();
+    let author;
+
+    socket.on('allProducts', data=>{
+        const list = document.getElementById('grid')
+        const allProducts = data.map(element => {
+            return  `<div class="card" id="card">
+                        <p class="title-card">${element.name}</p>
+                        <p>${element.price}</p>
+                        <img src="http://localhost:8080/img/${element.image}" class="img"></img>
+                    </div>`
+        })
+        list.innerHTML = allProducts.join('\n')
+    })
+
+    Form.addEventListener('submit',evt=>{
+        evt.preventDefault();
+        const name = document.getElementById('name');
+        const price = document.getElementById('price');
+        const image = document.getElementById('image');
+        const dividir = image.value.split('\\');
+        const nameFile = (null,Date.now()+"-"+dividir[2]);
+        let product = {
+            name: name.value,
+            price: price.value,
+            image: nameFile
+        };
+        socket.emit('addProduct',product);
+    })
+    
+    const Chat = document.getElementById('write-message');
+    Chat.addEventListener('submit',evt=>{
+        evt.preventDefault();
+        const message = document.getElementById('message');
+        let content = {
+            author: author,
+            date: new Date(Date.now()).toUTCString(),
+            message: message.value
+        };
+        socket.emit('messages', content)
+    })
+
+    socket.on("newMessage", data=>{
+        email = data[0].email
+        const box = document.getElementById('chat')
+        const newMessage = data.map(element => {
+            return  `<div>
+                        <img src=${element.author.avatar} class="avatar"></img>
+                        <span class="user-style">${element.author.nick}</span>
+                        <span class="date-style">${element.date}</span>
+                        <span class="message-style">${element.message}</span>
+                    </div>`
+        })
+        box.innerHTML = newMessage.join('\n')
+    })
+</script>

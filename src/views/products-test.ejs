@@ -1,0 +1,13 @@
+<%- include('./partials/head') %>
+
+<h2 class="title">Productos de faker.js</h2>
+
+<div class="grid" id="grid">
+    <% testProducts.forEach(product => { %>
+        <div class="card" id="card">
+            <p class="title-card"><%= product.name %> </p>
+            <p>$<%= product.price %></p>
+            <img src="<%= product.image %>" class="img"></img>
+        </div>
+    <% }) %>
+</div>
